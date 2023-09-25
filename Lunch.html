@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ランチ検索システム</title>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js">
+        //APIキーを設定
+        const apiKey = '';
+
+        const fs = require('fs');
+        const parser = require('xml2json');
+        const fetch = require('node-fetch');
+        const API_KEY = '1bda755b91505539';
+
+        /**APIのURL */
+        const URL = 'http://webservice.recruit.co.jp/hotpepper/gourmet/v1/?key=' + API_KEY + '&large_area=Z011'
+
+        /** 非同期処理 */
+        async function main() {
+        try {
+            const res = await fetch(URL);
+            if (!res.ok) {
+            throw new Error(`${res.status} ${res.statusText}`);
+            }
+            const data = await res.text();
+            var json = parser.toJson(data);
+
+            const obj = JSON.parse(json)
+            console.log('xmlns:' +obj.results.xmlns)
+            console.log('店舗名:' +obj.results.shop[0].name)
+            console.log('住所:' +obj.results.shop[0].address)
+        } catch (err) {
+            console.error(err);
+        }
+        }
+
+        main();
+    </script>
+</head>
+<body>
+    <div id="resultContainer">
+        <!-- 結果を表示させたい -->
+    </div>
+    <a href="http://webservice.recruit.co.jp/"><img src="http://webservice.recruit.co.jp/banner/hotpepper-s.gif" alt="ホットペッパー Webサービス" width="135" height="17" border="0" title="ホットペッパー Webサービス"></a>
+    <div class="container">
+        <div class="title">
+            <h1>ランチ検索システム</h1>
+            <p>現在地を取得しグルメサーチAPIを利用して近隣のお店を表示します</p>
+        </div>
+        <div class="searchQuery">
+            <form action="">
+                <label for="ranges">検索条件</label>
+                <select name="" id="ranges">
+                    <option value="1">300m</option>
+                    <option value="2">500m</option>
+                    <option value="3">1000m</option>
+                    <option value="4">2000m</option>
+                    <option value="5">3000m</option>
+                </select>
+            </form>
+            <button value="1" data-page="1">現在地取得</button>
+        </div>
+    </div>
+</body>
+</html>

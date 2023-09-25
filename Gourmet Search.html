@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ランチ検索システム</title>
+</head>
+<body>
+    <div class="top">
+        <a href="http://webservice.recruit.co.jp/"><img src="http://webservice.recruit.co.jp/banner/hotpepper-s.gif" alt="ホットペッパー Webサービス" width="135" height="17" border="0" title="ホットペッパー Webサービス"></a>
+    </div>
+    <div class="center">
+        <div class="btn-margin">
+            <button id="btn">
+                伊勢町平和ビル近くのお店を表示する
+            </button>
+            <!-- <button id="btn_serch">
+                近くの店を表示
+            </button>    -->
+        </div>
+        <div class="searchQuery">
+            <form action="">
+                <label for="ranges">検索条件</label>
+                <select name="" id="ranges">
+                    <option value="1">300m</option>
+                    <option value="2">500m</option>
+                    <option value="3">1000m</option>
+                    <option value="4">2000m</option>
+                    <option value="5">3000m</option>
+                </select>
+            </form>
+        </div>
+    </div>
+    <div id="map"></div>
+
+    <style>
+        /* 地図の範囲を決定 */
+        html { height: 100% }
+        body { height: 100% }
+        #map { height: 100%; width: 100%}
+    </style>
+
+    <script>
+        // Google map APIを利用するための読み込み
+        (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})({
+            key: "AIzaSyCor6lF6BR6j-t5Zh4V_3raLPUi8SquhmA",
+            v: "weekly",
+        });
+    </script>
+
+    <script>
+
+        // お店のデータを入れる配列
+        var shopDataArray = [];
+        var marker = [];
+        var infoWindow = [];
+
+        function loadJson(src){
+            var script = document.createElement('script');
+            script.src = src;
+            document.body.appendChild(script);
+        }
+
+        var callback = async function(data){
+
+            for (let i=0; i<data.results.shop.length; i++){
+                let shopData = {
+                    lat: data.results.shop[i].lat,      //店の緯度を追加
+                    lng: data.results.shop[i].lng,      //店の経度を追加
+                    name: data.results.shop[i].name,    //店の名前を追加
+                    url: data.results.shop[i].urls.pc   //PC向けURLの追加
+                };
+                shopDataArray.push(shopData);
+            }
+
+            
+            console.log(data.results.shop.length+"件の店が発見されました");
+            const { Map } = await google.maps.importLibrary("maps");
+
+            map = new Map(document.getElementById("map"), {
+                center: { lat: 35.1668328, lng: 136.9054752 },
+                zoom: 19,
+                mapId: "3d302b7b42f5ea8c",
+            });
+            
+            // 店の数だけマーカーを作成
+            for (var i=0; i < shopDataArray.length; i++){
+                var markerLatLng = new google.maps.LatLng({lat: shopDataArray[i]['lat'],lng: shopDataArray[i]['lng']}); //緯度経度のデータ作成
+                marker[i] = new google.maps.Marker({
+                    map: map,
+                    position: markerLatLng
+                })
+
+                // お店のURL情報を格納
+                infoWindow[i] = new google.maps.InfoWindow({ // 吹き出しの追加
+                    content: '<div class="sample">' + shopDataArray[i]['name'] +
+                             '<div><a href=' + shopDataArray[i]['url'] + ' target="_blank">詳細を表示</a></div>' // 吹き出しに表示する内容
+                });
+                markerEvent(i);     //マーカーにクリックイベントを追加
+            }
+        }
+
+        // マーカーを押すと店の情報を表示
+        function markerEvent(i){
+            marker[i].addListener('click', function(){
+                infoWindow[i].open(map, marker[i]);
+            })
+        }
+
+        // ボタンを押したときの処理
+        document.getElementById("btn").onclick = function(){
+            var lat = 35.1668328;
+            var lng = 136.9054752;
+            var selectElement = document.getElementById('ranges');
+            range = selectElement.value;                                                                                  
+            var URL = 'http://webservice.recruit.co.jp/hotpepper/gourmet/v1/?key=1bda755b91505539&name=&lat='+ lat + '&lng='+ lng + '&range=' + range + '&count=100&format=jsonp';
+
+            // 位置情報を取得する
+            loadJson(URL);
+        }
+    </script>
+</body>
+</html>

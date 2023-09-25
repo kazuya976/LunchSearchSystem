@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ランチ検索システム</title>
+
+    <!-- <script>
+        function callback(){
+            console.log("jgj");
+        }
+    </script> -->
+
+    <script src="http://webservice.recruit.co.jp/hotpepper/gourmet/v1/?key=1bda755b91505539&large_area=Z011&format=jsonp  ">
+        const API_KEY = '1bda755b91505539';
+
+        /**APIのURL */
+        // let URL = 'http://webservice.recruit.co.jp/hotpepper/gourmet/v1/?key=' + API_KEY + '&large_area=Z011&format=json';
+        const URL = 'http://webservice.recruit.co.jp/hotpepper/gourmet/v1/?key=1bda755b91505539&large_area=Z011&format=jsonp ';            
+
+        // var req = new XMLHttpRequest();
+        // req.open("GET", URL, false);
+        // req.send(null);
+        function callback(param){
+            console.log(param.results.shop[0].name);
+            console.log("コールバック関数が呼び出された");
+        }
+        // callback();
+        // getJSON();
+        // XMLファイルのURLを指定
+        // var jsonlUrl = "http://webservice.recruit.co.jp/hotpepper/gourmet/v1/?key=1bda755b91505539&large_area=Z011&format=jsonp";
+
+        function getJSON(){
+            console.log("呼び出されたよ");
+            var req = new XMLHttpRequest(); //XMLHttpRequestオブジェクトを生成する
+            req.onreadystatechange = function(){    //XMLHttpRequestオブジェクトの状態が変化した際に呼び出されるイベントハンドラ
+                if(req.readyState == 4 && req.status == 200){   //サーバーからのレスポンスが完了し、かつ、通信が正常に終了した場合
+                    alert(req.responseText);            //取得したJSONファイルの中身を表示
+                    console.log(req.responseText);
+                    console.log("aaa");
+                }
+            };
+            req.open("GET", URL, false);    //HTTPメソッドとアクセスするサーバー（JSONファイルが置いてあるサーバ）のURLを指定
+            req.send(null);     //実際にサーバーへリクエストを送信
+        }   
+        
+    </script>
+  
+</head>
+<body>
+    
+</body>
+</html>

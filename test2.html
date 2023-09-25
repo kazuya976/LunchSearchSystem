@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>テストを行う</title>
+</head>
+<body>
+    <div class="top">
+        <a href="http://webservice.recruit.co.jp/"><img src="http://webservice.recruit.co.jp/banner/hotpepper-s.gif" alt="ホットペッパー Webサービス" width="135" height="17" border="0" title="ホットペッパー Webサービス"></a>
+    </div>
+    <div class="center">
+        <div class="btn-margin">
+            <button id="btn">
+                現在位置を取得する
+            </button>
+            <button id="btn_serch">
+                近くの店を表示
+            </button>   
+        </div>
+    </div>
+    <div id="map"></div>
+    <!-- <script src="http://maps.google.com/maps/api/js?key=AIzaSyCor6lF6BR6j-t5Zh4V_3raLPUi8SquhmA&language=ja"></script> -->
+    <script>
+        (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})({
+          key: "AIzaSyCor6lF6BR6j-t5Zh4V_3raLPUi8SquhmA",
+          v: "weekly",
+          // Use the 'v' parameter to indicate the version to use (weekly, beta, alpha, etc.).
+          // Add other bootstrap parameters as needed, using camel case.
+        });
+      </script>
+
+
+    <style>
+        html { height: 100% }
+        body { height: 100% }
+        #map { height: 100%; width: 100%}
+    </style>
+
+    <script>
+        const API_KEY = '1bda755b91505539';
+        let range = "5";
+        let lat ;
+        let lng ;
+
+        // ボタンを押したときの処理
+        document.getElementById("btn").onclick = function(){
+            // 位置情報を取得する
+            navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
+            
+        }
+        
+        function successCallback(position){
+            lat = position.coords.latitude; // 緯度取得
+            lng = position.coords.longitude; //経度を取得
+            console.log("緯度は"+lat);
+            console.log("経度は"+lng);
+            URL = 'http://webservice.recruit.co.jp/hotpepper/gourmet/v1/?key=' + API_KEY + '&name=' + name + '&lat='+ lat + '&lng='+ lng + '&range=' + range + '&format=jsonp&free_food=0'
+            console.log(URL);
+            loadJson(URL);
+            initMap(lat,lng);
+
+        }
+        function errorCallback(error){
+            alert("位置情報が取得できませんでした");
+        };
+
+        // lat = position.coords.latitude; // 緯度取得
+        // lan = position.coords.longitude; // 経度取得
+
+        // let name = "";
+        // const URL = 'http://webservice.recruit.co.jp/hotpepper/gourmet/v1/?key=' + API_KEY + '&large_area=Z011&range=' + range + '&format=jsonp'
+        // const URL = 'http://webservice.recruit.co.jp/hotpepper/gourmet/v1/?key=' + API_KEY + '&name=' + name + '&lat='+ lat + '&lng='+ lng + '&range=' + range + '&format=jsonp&free_food=0'
+
+        function loadJson(src){
+            var script = document.createElement('script');
+            script.src = src;
+            document.body.appendChild(script);
+        }
+
+        var callback = function(data){
+            console.log(data.results.shop[0].name);
+            console.log(data.results.shop[1].name);
+            console.log(data.results.shop[2].name);
+            console.log(data.results.shop[3].name);
+            console.log(data.results.shop[4].name);
+        }
+
+        
+        let map;
+
+        
+        async function initMap(lat,lng) {
+            console.log("initMapが呼び出されました");
+            const { Map } = await google.maps.importLibrary("maps");
+
+            map = new Map(document.getElementById("map"), {
+                center: { lat: lat, lng: lng },
+                zoom: 19,
+                mapId: "3d302b7b42f5ea8c",
+            });
+            
+            const marker = new google.maps.Marker({
+                map: map,
+                position: { lat: lat, lng: lng },
+                title: "ntPosition",
+            });
+        }
+
+        async function initMap(){
+            const { Map } = await google.maps.importLibrary("maps");
+
+            map = new Map(document.getElementById("map"), { 
+                center: { lat: 35.1668328, lng: 136.9054752},
+                zoom: 19,
+                mapId: "3d302b7b42f5ea8c",
+            });            
+        }
+
+        // 検索ボタンを押したときの処理
+        document.getElementById("btn_serch").onclick = function(){
+            // 位置情報を取得する
+            navigator.geolocation.getCurrentPosition(successback, errorCallback);
+        }
+
+        //検索の成功バック
+        function successCallback(position){
+            lat = position.coords.latitude; // 緯度取得
+            lng = position.coords.longitude; //経度を取得
+            console.log("緯度は"+lat);
+            console.log("経度は"+lng);
+            URL = 'http://webservice.recruit.co.jp/hotpepper/gourmet/v1/?key=' + API_KEY + '&name=' + name + '&lat='+ lat + '&lng='+ lng + '&range=' + range + '&format=jsonp&free_food=0'
+            console.log(URL);
+            loadJson(URL);
+            initMap(lat,lng);
+
+        }
+
+        initMap();
+    </script>
+</body>
+</html>
