@@ -55,14 +55,17 @@
         var marker = [];
         var infoWindow = [];
 
+        // ホットペッパーAPIの読み込み
         function loadJson(src){
             var script = document.createElement('script');
             script.src = src;
             document.body.appendChild(script);
         }
 
+        // コールバック関数の作成
         var callback = async function(data){
 
+            // お店の情報を配列に格納
             for (let i=0; i<data.results.shop.length; i++){
                 let shopData = {
                     lat: data.results.shop[i].lat,      //店の緯度を追加
@@ -73,8 +76,8 @@
                 shopDataArray.push(shopData);
             }
 
-            
             console.log(data.results.shop.length+"件の店が発見されました");
+            // マップの作成
             const { Map } = await google.maps.importLibrary("maps");
 
             map = new Map(document.getElementById("map"), {
@@ -109,10 +112,13 @@
 
         // ボタンを押したときの処理
         document.getElementById("btn").onclick = function(){
+            // 緯度と経度を伊勢町平和ビルに設定
             var lat = 35.1668328;
             var lng = 136.9054752;
-            var selectElement = document.getElementById('ranges');
-            range = selectElement.value;                                                                                  
+
+            // 検索条件（パラメータ）をここで追加
+            var selectRange = document.getElementById('ranges');
+            range = selectRange.value;                                                                                  
             var URL = 'http://webservice.recruit.co.jp/hotpepper/gourmet/v1/?key=1bda755b91505539&name=&lat='+ lat + '&lng='+ lng + '&range=' + range + '&count=100&format=jsonp';
 
             // 位置情報を取得する
